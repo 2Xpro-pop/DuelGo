@@ -1,12 +1,13 @@
 package org.bayasik;
 
 import com.google.inject.Injector;
-import org.bayasik.commands.CloseConnectionLocker;
+import org.bayasik.connection.CloseConnectionLocker;
 import org.bayasik.connection.ConnectionContext;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class GameServer {
     private final int port;
@@ -58,7 +59,8 @@ public class GameServer {
 
             gameServer.sessionMiddlewaresHandler.handleOpenConnection(connectionContext);
 
-            connectionCloseLocker.waitClose();
+            while (socket.isConnected() && !socket.isClosed()){
+            }
 
             gameServer.sessionMiddlewaresHandler.handleCloseConnection(connectionContext);
         }

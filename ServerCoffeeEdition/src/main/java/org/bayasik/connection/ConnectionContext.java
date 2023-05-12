@@ -1,7 +1,5 @@
 package org.bayasik.connection;
 
-import org.bayasik.commands.CloseConnectionLocker;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,6 +10,11 @@ public interface ConnectionContext  {
     void close();
     <T> T get(Class<T> type);
     <T> void put(Class<? extends T> type, T instance);
+
+    default <T> void put(T instance){
+        var type = (Class<? extends T>) instance.getClass();
+        put(type, instance);
+    }
 
     public static ConnectionContext fromSocket(Socket socket) throws IOException {
         var context = new ConnectionContextImpl();
@@ -28,13 +31,24 @@ public interface ConnectionContext  {
         HashMap<Class<?>, Object> dictionary = new HashMap<>();
         @Override
         public synchronized void close() {
-            notifyAll();
+            var socket = get(Socket.class);
+            try {
+                socket.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            finally {
+                notifyAll();
+            }
         }
 
         @Override
         public synchronized void waitClose() {
+            var socket = get(Socket.class);
             try {
-                wait();
+                while (socket.isConnected() && !socket.isClosed()){
+                    wait();
+                }
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
