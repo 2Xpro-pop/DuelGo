@@ -1,17 +1,19 @@
 package org.bayasik;
 
 import com.google.inject.Guice;
-import com.google.inject.Injector;
 
 public class Main {
     public static void main(String[] args) {
         var injector = Guice.createInjector();
+        injector = injector.createChildInjector(binder -> {
 
-        var builder = new GameServerBuilder();
+        });
+
+        var builder = GameServerBuilder.create();
 
         builder.readCommands(Commands.class);
 
-        builder.use((context, next) -> {
+        builder.useOpen((context, next) -> {
             System.out.println("Hello world!");
             next.accept(context, next);
         });
@@ -21,6 +23,10 @@ public class Main {
             var room = server.createRoom();
             context.close();
         });
+
+        var server = builder.build();
+
+        server.start();
 
     }
 }

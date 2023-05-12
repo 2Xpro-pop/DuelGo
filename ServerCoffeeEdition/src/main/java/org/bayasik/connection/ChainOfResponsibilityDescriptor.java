@@ -1,24 +1,25 @@
 package org.bayasik.connection;
 
 import com.google.inject.Injector;
+import org.bayasik.connection.IChainOfConnectionHandler;
 
 public class ChainOfResponsibilityDescriptor
 {
-    private final Class<? extends IChainOfConnectionAccept> type;
-    private final IChainOfConnectionAccept instance;
+    private final Class<? extends IChainOfConnectionHandler> type;
+    private final IChainOfConnectionHandler instance;
     private Injector injector;
 
-    public ChainOfResponsibilityDescriptor(Class<? extends IChainOfConnectionAccept> type) {
+    public ChainOfResponsibilityDescriptor(Class<? extends IChainOfConnectionHandler> type) {
         this.type = type;
         this.instance = null;
     }
 
-    public ChainOfResponsibilityDescriptor(IChainOfConnectionAccept instance) {
+    public ChainOfResponsibilityDescriptor(IChainOfConnectionHandler instance) {
         this.type = null;
         this.instance = instance;
     }
 
-    public IChainOfConnectionAccept getInstance() {
+    public IChainOfConnectionHandler getInstance() {
         if (instance == null) {
             return injector.getInstance(type);
         }
