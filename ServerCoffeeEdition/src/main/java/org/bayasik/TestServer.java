@@ -5,7 +5,7 @@ import org.bayasik.commands.CommandsHandlersMiddleware;
 import org.bayasik.middleware.ConnectionLiverCheckerMiddleware;
 import org.bayasik.messages.MessageMiddlewareHandler;
 
-public class Main {
+public class TestServer {
     public static void main(String[] args) {
 
         var builder = GameServerBuilder.create();
@@ -32,7 +32,6 @@ public class Main {
         builder.addCommandHandler(Commands.CREATE_ROOM, (context) -> {
             var server = context.get(GameServer.class);
             System.out.println("Command work!");
-            var room = server.createRoom();
             context.close();
         });
 
