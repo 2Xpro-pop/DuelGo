@@ -4,6 +4,9 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.bayasik.commands.*;
 import org.bayasik.connection.IChainOfConnectionHandler;
+import org.bayasik.messages.BinaryMessageReaderStrategy;
+import org.bayasik.messages.MessageReaderStrategy;
+import org.bayasik.middleware.CommandsHandlersMiddleware;
 
 public abstract class GameServerBuilder {
     protected Injector injector;
@@ -22,6 +25,8 @@ public abstract class GameServerBuilder {
     public abstract void addCommandHandler(CommandHandler handler);
 
     public abstract void addCommandHandler(short command,AnonymousCommand anonymousCommand);
+
+    public abstract void configureInjector(com.google.inject.Module module);
 
     public abstract GameServer build();
 
@@ -44,9 +49,11 @@ public abstract class GameServerBuilder {
     public static GameServerBuilder create() {
         var builder =  new GameServerBuilderImpl();
 
-        var injector = Guice.createInjector();
-        builder.setInjector(injector);
+        var injector = Guice.createInjector((binder -> {
+            binder.bind(MessageReaderStrategy.class).to(BinaryMessageReaderStrategy.class);
+        }));
 
+        builder.setInjector(injector);
 
         return builder;
     }

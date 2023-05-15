@@ -5,21 +5,20 @@ import org.bayasik.connection.ChainOfResponsibilityDescriptor;
 import org.bayasik.connection.ConnectionContext;
 import org.bayasik.connection.IChainOfConnectionHandler;
 import org.bayasik.connection.InjectableChainOfResponsibility;
+import org.bayasik.messages.BinaryMessageReaderStrategy;
+import org.bayasik.messages.MessageReaderStrategy;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GameServerBuilderImpl extends GameServerBuilder {
     private final Map<Short, String> commands = new HashMap<>();
     private final List<ChainOfResponsibilityDescriptor> chainsOfOpenConnection = new ArrayList<>();
     private final List<ChainOfResponsibilityDescriptor> chainsOfCloseConnection = new ArrayList<>();
     private final List<CommandHandlerDescriptor> commandHandlers = new ArrayList<>();
-    private final List<CommandDescriptor> anonymousCommands = new ArrayList<>();
+    private final List<CommandDescriptor> commandDescriptors = new ArrayList<>();
 
     @Override
     public void readCommands(Class<?> type) {
@@ -70,50 +69,62 @@ public class GameServerBuilderImpl extends GameServerBuilder {
     public void addCommandHandler(CommandHandler handler) {
         var methods = getEndpoints(handler.getClass());
         commandHandlers.add(new CommandHandlerDescriptor(handler, methods));
+        for (var method : methods) {
+            method.setInstance(handler);
+            commandDescriptors.add(method);
+        }
     }
 
     @Override
     public void addCommandHandler(short command, AnonymousCommand anonymousCommand){
-        anonymousCommands.add(new CommandDescriptor(command, anonymousCommand));
+        commandDescriptors.add(new CommandDescriptor(command, anonymousCommand));
+    }
+
+    @Override
+    public void configureInjector(com.google.inject.Module module){
+        var injector = getInjector().createChildInjector(module);
+        setInjector(injector);
     }
 
     @Override
     public GameServer build() {
+        configureInjector((binder -> {
+            binder.bind(CommandDescriptor[].class).toInstance(commandDescriptors.toArray(new CommandDescriptor[0]));
+            binder.bind(Map.class).toInstance(Collections.unmodifiableMap(commands));
+        }));
+
         var middlewares = createMiddlewares();
 
         return new GameServer(port, injector, middlewares);
     }
 
     private SessionMiddlewaresHandler createMiddlewares(){
-        for(var chainOfOpenConnection : chainsOfOpenConnection){
-            chainOfOpenConnection.setInjector(injector);
-        }
-        var middlewareOfOpenConnection = new InjectableChainOfResponsibility(
-                chainsOfOpenConnection.toArray(new ChainOfResponsibilityDescriptor[0])
-        );
 
-        for(var chainOfCloseConnection : chainsOfCloseConnection){
-            chainOfCloseConnection.setInjector(injector);
-        }
-        var middlewareOfCloseConnection = new InjectableChainOfResponsibility(
-                chainsOfCloseConnection.toArray(new ChainOfResponsibilityDescriptor[0])
+        var middlewareOfOpenConnection = new InjectableChainOfResponsibility(
+            chainsOfOpenConnection.toArray(new ChainOfResponsibilityDescriptor[0])
         );
+        middlewareOfOpenConnection.setInjector(injector);
+
+        var middlewareOfCloseConnection = new InjectableChainOfResponsibility(
+            chainsOfCloseConnection.toArray(new ChainOfResponsibilityDescriptor[0])
+        );
+        middlewareOfCloseConnection.setInjector(injector);
 
         return new SessionMiddlewaresHandler()
         {
             @Override
-            public void handleCloseConnection(ConnectionContext context) {
-                middlewareOfCloseConnection.accept(context);
+            public void handleOpenConnection(ConnectionContext context) {
+                middlewareOfOpenConnection.accept(context);
             }
 
             @Override
-            public void handleOpenConnection(ConnectionContext context) {
-                middlewareOfOpenConnection.accept(context);
+            public void handleCloseConnection(ConnectionContext context) {
+                middlewareOfCloseConnection.accept(context);
             }
         };
     }
 
-    private Iterable<CommandDescriptor> getEndpoints(Class<? extends CommandHandler> type) {
+    private Collection<CommandDescriptor> getEndpoints(Class<? extends CommandHandler> type) {
         var methods = new ArrayList<CommandDescriptor>();
         for (Method method : type.getDeclaredMethods()) {
             if (Modifier.isPublic(method.getModifiers()) &&

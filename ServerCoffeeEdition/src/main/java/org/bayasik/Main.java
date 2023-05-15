@@ -1,16 +1,11 @@
 package org.bayasik;
 
 import com.google.inject.Guice;
-import com.google.inject.Injector;
-import org.bayasik.middleware.ConnectionLiverChecker;
 import org.bayasik.middleware.ConnectionLiverCheckerMiddleware;
+import org.bayasik.messages.MessageMiddlewareHandler;
 
 public class Main {
     public static void main(String[] args) {
-        var injector = Guice.createInjector();
-        injector = injector.createChildInjector(binder -> {
-
-        });
 
         var builder = GameServerBuilder.create();
 
@@ -19,6 +14,7 @@ public class Main {
         builder.setPort(14908);
 
         builder.useOpen(ConnectionLiverCheckerMiddleware.class);
+        builder.useOpen(MessageMiddlewareHandler.class);
 
         builder.useOpen((context, next) -> {
             System.out.println("Hello world!");
@@ -40,6 +36,5 @@ public class Main {
         var server = builder.build();
 
         server.start();
-
     }
 }

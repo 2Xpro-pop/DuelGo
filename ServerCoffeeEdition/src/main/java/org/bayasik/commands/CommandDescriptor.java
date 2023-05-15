@@ -12,7 +12,8 @@ public class CommandDescriptor {
     public CommandDescriptor(Method method, short commandId) {
         this.method = method;
         this.commandId = commandId;
-        this.anonymousCommand = null;;
+        this.anonymousCommand = null;
+        ;
     }
 
     public CommandDescriptor(short commandId, AnonymousCommand anonymousCommand) {
@@ -28,4 +29,9 @@ public class CommandDescriptor {
     public void setInstance(CommandHandler instance) {
         this.instance = instance;
     }
+
+    public boolean isAnonymous() {
+        return anonymousCommand != null;
+    }
+
 }
