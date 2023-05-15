@@ -3,7 +3,7 @@ package org.bayasik;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.bayasik.commands.*;
-import org.bayasik.connection.IChainOfConnectionHandler;
+import org.bayasik.connection.IChainOfResponsibility;
 import org.bayasik.messages.BinaryMessageReaderStrategy;
 import org.bayasik.messages.MessageReaderStrategy;
 
@@ -12,12 +12,12 @@ public abstract class GameServerBuilder {
     protected int port;
     public abstract void readCommands(Class<?> type);
 
-    public abstract void useOpen(Class<? extends IChainOfConnectionHandler> type);
-    public abstract void useOpen(IChainOfConnectionHandler accept);
+    public abstract void useOpen(Class<? extends IChainOfResponsibility> type);
+    public abstract void useOpen(IChainOfResponsibility accept);
 
-    public abstract void useClose(Class<? extends IChainOfConnectionHandler> type);
+    public abstract void useClose(Class<? extends IChainOfResponsibility> type);
 
-    public abstract void useClose(IChainOfConnectionHandler close);
+    public abstract void useClose(IChainOfResponsibility close);
 
     public abstract void addCommandHandler(Class<? extends CommandHandler> type);
 

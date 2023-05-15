@@ -3,10 +3,8 @@ package org.bayasik;
 import org.bayasik.commands.*;
 import org.bayasik.connection.ChainOfResponsibilityDescriptor;
 import org.bayasik.connection.ConnectionContext;
-import org.bayasik.connection.IChainOfConnectionHandler;
+import org.bayasik.connection.IChainOfResponsibility;
 import org.bayasik.connection.InjectableChainOfResponsibility;
-import org.bayasik.messages.BinaryMessageReaderStrategy;
-import org.bayasik.messages.MessageReaderStrategy;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -40,22 +38,22 @@ public class GameServerBuilderImpl extends GameServerBuilder {
     }
 
     @Override
-    public void useOpen(Class<? extends IChainOfConnectionHandler> type) {
+    public void useOpen(Class<? extends IChainOfResponsibility> type) {
         chainsOfOpenConnection.add(new ChainOfResponsibilityDescriptor(type));
     }
 
     @Override
-    public void useOpen(IChainOfConnectionHandler accept) {
+    public void useOpen(IChainOfResponsibility accept) {
         chainsOfOpenConnection.add(new ChainOfResponsibilityDescriptor(accept));
     }
 
     @Override
-    public void useClose(Class<? extends IChainOfConnectionHandler> type) {
+    public void useClose(Class<? extends IChainOfResponsibility> type) {
         chainsOfCloseConnection.add(new ChainOfResponsibilityDescriptor(type));
     }
 
     @Override
-    public void useClose(IChainOfConnectionHandler close) {
+    public void useClose(IChainOfResponsibility close) {
         chainsOfCloseConnection.add(new ChainOfResponsibilityDescriptor(close));
     }
 

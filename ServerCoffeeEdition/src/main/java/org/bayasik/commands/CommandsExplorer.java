@@ -27,6 +27,7 @@ public class CommandsExplorer {
     public CommandDescriptor getCommandDescriptor(CommandToken commandToken) {
         for (var commandDescriptor : commandDescriptors) {
             if (commandDescriptor.commandId == commandToken.commandId()) {
+                if(commandDescriptor.getInstance() != null && !commandDescriptor.getInstance().canHandle()) continue;
                 return commandDescriptor;
             }
         }
@@ -36,6 +37,7 @@ public class CommandsExplorer {
     public CommandDescriptor getCommandDescriptor(short commandId) {
         for (var commandDescriptor : commandDescriptors) {
             if (commandDescriptor.commandId == commandId) {
+                if(commandDescriptor.getInstance() != null && !commandDescriptor.getInstance().canHandle()) continue;
                 return commandDescriptor;
             }
         }
@@ -56,6 +58,8 @@ public class CommandsExplorer {
         if(commandDescriptor.getInstance() == null){
             throw new RuntimeException("Command instance not found");
         }
+
+
 
         InvokeWithParameters(commandDescriptor.getInstance(), commandDescriptor.method, commandToken.data());
     }

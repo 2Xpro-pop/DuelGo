@@ -16,13 +16,13 @@ public class InjectableChainOfResponsibility {
     }
 
     public void accept(ConnectionContext context) {
-        IChainOfConnectionHandler[] handlers = new IChainOfConnectionHandler[descriptors.length];
+        IChainOfResponsibility[] handlers = new IChainOfResponsibility[descriptors.length];
 
         for (int i = 0; i < descriptors.length; i++) {
             handlers[i] = descriptors[i].getInstance();
         }
 
-        var invoker = new IChainOfConnectionHandler.NextInvoker(handlers);
+        var invoker = new IChainOfResponsibility.NextInvoker(handlers);
 
         invoker.accept(context, null);
     }

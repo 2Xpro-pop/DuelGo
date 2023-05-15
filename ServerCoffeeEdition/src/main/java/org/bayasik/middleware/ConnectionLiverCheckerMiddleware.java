@@ -1,14 +1,12 @@
 package org.bayasik.middleware;
 
 import org.bayasik.connection.ConnectionContext;
-import org.bayasik.connection.IChainOfConnectionHandler;
+import org.bayasik.connection.IChainOfResponsibility;
 
-import java.net.Socket;
-
-public class ConnectionLiverCheckerMiddleware implements IChainOfConnectionHandler {
+public class ConnectionLiverCheckerMiddleware implements IChainOfResponsibility {
 
     @Override
-    public void accept(ConnectionContext context, IChainOfConnectionHandler next) {
+    public void accept(ConnectionContext context, IChainOfResponsibility next) {
         var connectionLiverChecker = new ConnectionLiverChecker(context);
         connectionLiverChecker.start();
 
