@@ -90,6 +90,14 @@ public class CommandsExplorer {
             if(type == double.class){
                 args[i] = Double.longBitsToDouble((long) ((data[lastParamIndex++] << 56) | (data[lastParamIndex++] << 48) | (data[lastParamIndex++] << 40) | (data[lastParamIndex++] << 32) | (data[lastParamIndex++] << 24) | (data[lastParamIndex++] << 16) | (data[lastParamIndex++] << 8) | data[lastParamIndex++]));
             }
+            if(type == boolean.class){
+                args[i] = data[lastParamIndex++] == 1;
+            }
+            if(type == byte[].class){
+                var lastBytes = new byte[data.length - lastParamIndex];
+                System.arraycopy(data, lastParamIndex, lastBytes, 0, lastBytes.length);
+                args[i] = lastBytes;
+            }
             if(type == String.class){
                 var vm = readString(data, lastParamIndex);
                 args[i] = vm.instance;
