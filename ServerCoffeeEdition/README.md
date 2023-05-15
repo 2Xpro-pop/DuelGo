@@ -99,7 +99,7 @@ class MyCustomMessageHandler implements IChainOfResponsibility {
     }
 
     @Override
-    public void handle() {
+    public void accept(ConnectionContext context, IChainOfResponsibility next) {
         var message = messageContext.lastMessage(); // message which was readed by MessageReaderStrategy
 
         ... // Parse the message and invoke the corresponding command handler
