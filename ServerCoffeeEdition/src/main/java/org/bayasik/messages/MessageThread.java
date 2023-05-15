@@ -52,8 +52,6 @@ public class MessageThread extends Thread {
 
                 middlewareOfGettingMessage.accept(connectionContext);
 
-                System.out.println("Message: " + messageContext);
-
                 connectionLiverChecker.updateLastTime();
 
             }

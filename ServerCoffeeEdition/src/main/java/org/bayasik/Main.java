@@ -1,6 +1,7 @@
 package org.bayasik;
 
 import com.google.inject.Guice;
+import org.bayasik.commands.CommandsHandlersMiddleware;
 import org.bayasik.middleware.ConnectionLiverCheckerMiddleware;
 import org.bayasik.messages.MessageMiddlewareHandler;
 
@@ -15,6 +16,7 @@ public class Main {
 
         builder.useOpen(ConnectionLiverCheckerMiddleware.class);
         builder.useOpen(MessageMiddlewareHandler.class);
+        builder.useOpen(CommandsHandlersMiddleware.class);
 
         builder.useOpen((context, next) -> {
             System.out.println("Hello world!");
@@ -29,9 +31,12 @@ public class Main {
 
         builder.addCommandHandler(Commands.CREATE_ROOM, (context) -> {
             var server = context.get(GameServer.class);
+            System.out.println("Command work!");
             var room = server.createRoom();
             context.close();
         });
+
+        builder.addCommandHandler(TestCommandHandler.class);
 
         var server = builder.build();
 

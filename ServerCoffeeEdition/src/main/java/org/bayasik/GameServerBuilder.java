@@ -6,7 +6,6 @@ import org.bayasik.commands.*;
 import org.bayasik.connection.IChainOfConnectionHandler;
 import org.bayasik.messages.BinaryMessageReaderStrategy;
 import org.bayasik.messages.MessageReaderStrategy;
-import org.bayasik.middleware.CommandsHandlersMiddleware;
 
 public abstract class GameServerBuilder {
     protected Injector injector;

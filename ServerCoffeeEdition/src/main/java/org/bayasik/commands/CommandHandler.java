@@ -4,5 +4,7 @@ import org.bayasik.connection.ConnectionContext;
 
 public interface CommandHandler {
     void setContext(ConnectionContext context);
-    boolean canHandle();
+    default boolean canHandle() {
+        return true;
+    }
 }

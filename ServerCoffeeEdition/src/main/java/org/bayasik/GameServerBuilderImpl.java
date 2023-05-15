@@ -63,6 +63,7 @@ public class GameServerBuilderImpl extends GameServerBuilder {
     public void addCommandHandler(Class<? extends CommandHandler> type) {
         var methods = getEndpoints(type);
         commandHandlers.add(new CommandHandlerDescriptor(type, methods));
+        commandDescriptors.addAll(methods);
     }
 
     @Override
@@ -128,9 +129,6 @@ public class GameServerBuilderImpl extends GameServerBuilder {
         var methods = new ArrayList<CommandDescriptor>();
         for (Method method : type.getDeclaredMethods()) {
             if (Modifier.isPublic(method.getModifiers()) &&
-                    Modifier.isFinal(method.getModifiers()) &&
-                    Modifier.isStatic(method.getModifiers()) &&
-                    method.getReturnType() == void.class &&
                     method.isAnnotationPresent(Command.class)) {
                 var annotation = method.getAnnotation(Command.class);
                 short commandId = annotation.value();

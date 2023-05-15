@@ -38,10 +38,6 @@ public class GameServer {
         }
     }
 
-    public Room createRoom(){
-        return new Room();
-    }
-
     private static class SocketThread extends Thread
     {
         private final GameServer gameServer;
